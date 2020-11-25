@@ -321,3 +321,99 @@ false
 GET /t?k=v
 --- response_body
 true
+
+
+
+=== TEST 17: not operator
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"k", "!", ">", 10}
+            })
+
+            ngx.say(ex:eval({k = 11}))
+            ngx.say(ex:eval({k = 9}))
+        }
+    }
+--- response_body
+false
+true
+
+
+
+=== TEST 18: and + not operator
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"x", ">", 10},
+                {"x", "!", ">", 15},
+            })
+
+            ngx.say(ex:eval({x = 11}))
+            ngx.say(ex:eval({x = 16}))
+        }
+    }
+--- response_body
+true
+false
+
+
+
+=== TEST 19: not ~~
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"k", "!", "~~", "[a-z]"}
+            })
+
+            ngx.say(ex:eval({k = "a"}))
+            ngx.say(ex:eval({k = "9"}))
+        }
+    }
+--- response_body
+false
+true
+
+
+
+=== TEST 20: not in
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"k", "!", "in", {1, 2}}
+            })
+
+            ngx.say(ex:eval({k = 3}))
+            ngx.say(ex:eval({k = 1}))
+        }
+    }
+--- response_body
+true
+false
+
+
+
+=== TEST 21: not has
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"k", "!", "has", 1}
+            })
+
+            ngx.say(ex:eval({k = {2, 3}}))
+            ngx.say(ex:eval({k = {1, 2}}))
+        }
+    }
+--- response_body
+true
+false

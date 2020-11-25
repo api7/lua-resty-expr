@@ -37,10 +37,12 @@ Table of Contents
             {
                 {"arg_name", "==", "json"},
                 {"arg_weight", ">", 10},
+                {"arg_weight", "!", ">", 15},
             }
         })
 
-        -- equal to 'ngx.say(ngx.var.arg_name == "json" and ngx.var.arg_weight > 10)'
+        -- equal to
+        -- 'ngx.say(ngx.var.arg_name == "json" and ngx.var.arg_weight > 10 and not ngx.var.arg_weight > 15)'
         ngx.say(ex:eval(ngx.var))
      }
  }
@@ -60,7 +62,7 @@ The syntax of rule is an array table of expressions.
 Each expression is an array table which has three elements:
 ```lua
 {
-    {"var name (aka. left value)", "operator", "const value (aka. right value)"},
+    {"var name (aka. left value)", "optional '!' operator", "operator", "const value (aka. right value)"},
     ...
 }
 ```
@@ -78,6 +80,7 @@ Each expression is an array table which has three elements:
 |~~      |Regular match|{"arg_name", "~~", "[a-z]+"}|
 |in      |find in array|{"arg_name", "in", {"1","2"}}|
 |has     |left value array has value in the right |{"graphql_root_fields", "has", "repo"}|
+|!       |reverse the result|{"arg_name", "!", "~~", "[a-z]+"}|
 
 [Back to TOC](#table-of-contents)
 

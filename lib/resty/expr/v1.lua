@@ -21,6 +21,7 @@ local ipairs      = ipairs
 local setmetatable = setmetatable
 local tonumber    = tonumber
 local type = type
+local new_tab     = require("table.new")
 local re_find     = ngx.re.find
 local ngx_var     = ngx.var
 local ngx_null    = ngx.null
@@ -28,6 +29,7 @@ local ngx_null    = ngx.null
 
 local _M = {}
 local mt = { __index = _M }
+local not_op = "!"
 
 
 function _M.new(rule)
@@ -35,7 +37,31 @@ function _M.new(rule)
         return nil, "missing argument route"
     end
 
-    return setmetatable({rule = rule}, mt)
+    local compiled = new_tab(#rule, 0)
+    for i, expr in ipairs(rule) do
+        local l_v, op, r_v
+        local reverse = false
+
+        if expr[2] == not_op then
+            if #expr ~= 4 then
+                return nil, "bad 'not' expression"
+            end
+
+            reverse = true
+            l_v, op, r_v = expr[1], expr[3], expr[4]
+        else
+            l_v, op, r_v = expr[1], expr[2], expr[3]
+        end
+
+        compiled[i] = {
+            l_v = l_v,
+            op = op,
+            r_v = r_v,
+            reverse = reverse,
+        }
+    end
+
+    return setmetatable({rule = compiled}, mt)
 end
 
 
@@ -130,10 +156,9 @@ function _M.eval(self, ctx, ...)
     end
 
     for _, expr in ipairs(self.rule) do
-        local l_v, op, r_v = expr[1], expr[2], expr[3]
-        l_v = ctx[l_v]
+        local l_v = ctx[expr.l_v]
 
-        if not compare_val(l_v, op, r_v, ...) then
+        if compare_val(l_v, expr.op, expr.r_v, ...) == expr.reverse then
             return false
         end
     end
