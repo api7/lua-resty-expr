@@ -73,7 +73,6 @@ Each expression is an array table which has three elements:
 
 |operator|description|example|
 |--------|-----------|-------|
-|!       |reverse the result|{"arg_name", "!", "~~", "[a-z]+"}|
 |==      |equal      |{"arg_name", "==", "json"}|
 |~=      |not equal  |{"arg_name", "~=", "json"}|
 |>       |greater than|{"arg_age", ">", 24}|
@@ -81,6 +80,7 @@ Each expression is an array table which has three elements:
 |~~      |Regular match|{"arg_name", "~~", "[a-z]+"}|
 |in      |find in array|{"arg_name", "in", {"1","2"}}|
 |has     |left value array has value in the right |{"graphql_root_fields", "has", "repo"}|
+|!       |reverse the result|{"arg_name", "!", "~~", "[a-z]+"}|
 
 [Back to TOC](#table-of-contents)
 

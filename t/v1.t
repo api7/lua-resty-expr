@@ -360,3 +360,60 @@ true
 --- response_body
 true
 false
+
+
+
+=== TEST 19: not ~~
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"k", "!", "~~", "[a-z]"}
+            })
+
+            ngx.say(ex:eval({k = "a"}))
+            ngx.say(ex:eval({k = "9"}))
+        }
+    }
+--- response_body
+false
+true
+
+
+
+=== TEST 20: not in
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"k", "!", "in", {1, 2}}
+            })
+
+            ngx.say(ex:eval({k = 3}))
+            ngx.say(ex:eval({k = 1}))
+        }
+    }
+--- response_body
+true
+false
+
+
+
+=== TEST 21: not has
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"k", "!", "has", 1}
+            })
+
+            ngx.say(ex:eval({k = {2, 3}}))
+            ngx.say(ex:eval({k = {1, 2}}))
+        }
+    }
+--- response_body
+true
+false
