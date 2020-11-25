@@ -37,10 +37,12 @@ Table of Contents
             {
                 {"arg_name", "==", "json"},
                 {"arg_weight", ">", 10},
+                {"arg_weight", "!", ">", 15},
             }
         })
 
-        -- equal to 'ngx.say(ngx.var.arg_name == "json" and ngx.var.arg_weight > 10)'
+        -- equal to
+        -- 'ngx.say(ngx.var.arg_name == "json" and ngx.var.arg_weight > 10 and not ngx.var.arg_weight > 15)'
         ngx.say(ex:eval(ngx.var))
      }
  }
@@ -60,7 +62,7 @@ The syntax of rule is an array table of expressions.
 Each expression is an array table which has three elements:
 ```lua
 {
-    {"var name (aka. left value)", "operator", "const value (aka. right value)"},
+    {"var name (aka. left value)", "optional '!' operator", "operator", "const value (aka. right value)"},
     ...
 }
 ```
@@ -71,6 +73,7 @@ Each expression is an array table which has three elements:
 
 |operator|description|example|
 |--------|-----------|-------|
+|!       |reverse the result|{"arg_name", "!", "~~", "[a-z]+"}|
 |==      |equal      |{"arg_name", "==", "json"}|
 |~=      |not equal  |{"arg_name", "~=", "json"}|
 |>       |greater than|{"arg_age", ">", 24}|
