@@ -417,3 +417,45 @@ false
 --- response_body
 true
 false
+
+=== TEST 22: operator ~*
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"x", "~*", "A"}
+            })
+
+            ngx.say(ex:eval({x = 'a'}))
+            ngx.say(ex:eval({x = 'A'}))
+            ngx.say(ex:eval({x = 'b'}))
+            ngx.say(ex:eval({x = ''))
+        }
+    }
+--- response_body
+true
+true
+false
+false
+
+=== TEST 23: not ~*
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"x", "!", "~*", "A"}
+            })
+
+            ngx.say(ex:eval({x = 'a'}))
+            ngx.say(ex:eval({x = 'A'}))
+            ngx.say(ex:eval({x = 'b'}))
+            ngx.say(ex:eval({x = ''))
+        }
+    }
+--- response_body
+false
+false
+true
+true
