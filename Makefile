@@ -6,7 +6,7 @@ LUAJIT_DIR ?= $(shell ${OR_EXEC} -V 2>&1 | grep prefix | grep -Eo 'prefix=(.*)/n
 ### test:         Run test suite
 .PHONY: test
 test: lint
-	prove -I../test-nginx/lib -I. -r -s t/
+	prove -I. -r -s t/
 
 
 ### install:      Install the library to runtime
