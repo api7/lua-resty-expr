@@ -128,6 +128,13 @@ local compare_funcs = {
         end
         return false
     end,
+    ["~*"] = function (l_v, r_v)
+        local from = re_find(l_v, r_v, "joi")
+        if from then
+            return true
+        end
+        return false
+    end,
     ["IN"] = in_array,
     ["in"] = in_array,
     ["has"] = has_element,
