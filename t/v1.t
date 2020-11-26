@@ -430,7 +430,7 @@ false
             ngx.say(ex:eval({x = 'a'}))
             ngx.say(ex:eval({x = 'A'}))
             ngx.say(ex:eval({x = 'b'}))
-            ngx.say(ex:eval({x = ''))
+            ngx.say(ex:eval({x = ''}))
         }
     }
 --- response_body
@@ -451,7 +451,7 @@ false
             ngx.say(ex:eval({x = 'a'}))
             ngx.say(ex:eval({x = 'A'}))
             ngx.say(ex:eval({x = 'b'}))
-            ngx.say(ex:eval({x = ''))
+            ngx.say(ex:eval({x = ''}))
         }
     }
 --- response_body
