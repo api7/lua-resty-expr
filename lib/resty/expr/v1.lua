@@ -32,39 +32,6 @@ local mt = { __index = _M }
 local not_op = "!"
 
 
-function _M.new(rule)
-    if not rule then
-        return nil, "missing argument route"
-    end
-
-    local compiled = new_tab(#rule, 0)
-    for i, expr in ipairs(rule) do
-        local l_v, op, r_v
-        local reverse = false
-
-        if expr[2] == not_op then
-            if #expr ~= 4 then
-                return nil, "bad 'not' expression"
-            end
-
-            reverse = true
-            l_v, op, r_v = expr[1], expr[3], expr[4]
-        else
-            l_v, op, r_v = expr[1], expr[2], expr[3]
-        end
-
-        compiled[i] = {
-            l_v = l_v,
-            op = op,
-            r_v = r_v,
-            reverse = reverse,
-        }
-    end
-
-    return setmetatable({rule = compiled}, mt)
-end
-
-
 local function in_array(l_v, r_v)
     if type(r_v) == "table" then
         for _,v in ipairs(r_v) do
@@ -146,11 +113,62 @@ local function compare_val(l_v, op, r_v)
         r_v = nil
     end
 
-    local com_fun = compare_funcs[op or "=="]
+    local com_fun = compare_funcs[op]
     if not com_fun then
         return false
     end
     return com_fun(l_v, r_v)
+end
+
+
+function _M.new(rule)
+    if not rule then
+        return nil, "missing argument route"
+    end
+
+    local compiled = new_tab(#rule, 0)
+    for i, expr in ipairs(rule) do
+        local l_v, op, r_v
+        local reverse = false
+
+        if #expr == 4 then
+            if expr[2] ~= not_op then
+                return nil, "bad 'not' expression"
+            end
+
+            reverse = true
+            l_v, op, r_v = expr[1], expr[3], expr[4]
+        else
+            l_v, op, r_v = expr[1], expr[2], expr[3]
+        end
+
+        if r_v == nil and not compare_funcs[op] then
+            -- for compatibility
+            r_v = op
+            op = "=="
+
+            if r_v == nil then
+                return nil, "invalid expression"
+            end
+        end
+
+        if l_v == nil or op == nil then
+            return nil, "invalid expression"
+        end
+
+        if compare_funcs[op] == nil then
+            return nil, "invalid operator '" .. op .. "'"
+        end
+
+        compiled[i] = {
+            l_v = l_v,
+            op = op,
+            r_v = r_v,
+            reverse = reverse,
+        }
+    end
+
+    return setmetatable({rule = compiled}, mt)
 end
 
 
