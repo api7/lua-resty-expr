@@ -3,6 +3,17 @@
 use t::Expr 'no_plan';
 
 repeat_each(1);
+
+add_block_preprocessor(sub {
+    my ($block) = @_;
+
+    if (!$block->no_error_log) {
+        $block->set_value("no_error_log", "[error]\n[alert]");
+    }
+
+    $block;
+});
+
 run_tests();
 
 __DATA__
@@ -206,17 +217,17 @@ false
     location /t {
         content_by_lua_block {
             local expr = require("resty.expr.v1")
-            local ex = expr.new({
+            local ex, err = expr.new({
                 {"arg_k", "invalid", 10}
             })
 
-            ngx.say(ex:eval(ngx.var))
+            ngx.say(err)
         }
     }
 --- request
 GET /t?k=9
 --- response_body
-false
+invalid operator 'invalid'
 
 
 
@@ -418,6 +429,8 @@ false
 true
 false
 
+
+
 === TEST 22: operator ~*
 --- config
     location /t {
@@ -439,6 +452,8 @@ true
 false
 false
 
+
+
 === TEST 23: not ~*
 --- config
     location /t {
@@ -459,3 +474,37 @@ false
 false
 true
 true
+
+
+
+=== TEST 24: bad argument for ~~
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"arg_k", "~~", "A"}
+            })
+
+            ngx.say(ex:eval(ngx.var))
+        }
+    }
+--- response_body
+false
+
+
+
+=== TEST 25: bad argument for ~*
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"arg_k", "~*", "A"}
+            })
+
+            ngx.say(ex:eval(ngx.var))
+        }
+    }
+--- response_body
+false
