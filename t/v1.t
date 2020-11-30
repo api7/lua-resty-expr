@@ -474,3 +474,37 @@ false
 false
 true
 true
+
+
+
+=== TEST 24: bad argument for ~~
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"arg_k", "~~", "A"}
+            })
+
+            ngx.say(ex:eval(ngx.var))
+        }
+    }
+--- response_body
+false
+
+
+
+=== TEST 25: bad argument for ~*
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"arg_k", "~*", "A"}
+            })
+
+            ngx.say(ex:eval(ngx.var))
+        }
+    }
+--- response_body
+false
