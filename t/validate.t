@@ -77,3 +77,18 @@ invalid expression
     }
 --- response_body
 bad 'not' expression
+
+
+
+=== TEST 4: empty argument
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex, err = expr.new()
+
+            ngx.say(err)
+        }
+    }
+--- response_body
+missing argument rule
