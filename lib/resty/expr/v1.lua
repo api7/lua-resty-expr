@@ -123,7 +123,7 @@ end
 
 function _M.new(rule)
     if not rule then
-        return nil, "missing argument route"
+        return nil, "missing argument rule"
     end
 
     local compiled = new_tab(#rule, 0)
