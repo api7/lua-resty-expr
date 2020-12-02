@@ -70,6 +70,12 @@ local compare_funcs = {
         return l_v == r_v
     end,
     ["~="] = function (l_v, r_v)
+        if type(r_v) == "number" then
+            l_v = tonumber(l_v)
+            if not l_v then
+                return true
+            end
+        end
         return l_v ~= r_v
     end,
     [">"] = function (l_v, r_v)

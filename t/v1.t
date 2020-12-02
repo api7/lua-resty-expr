@@ -508,3 +508,79 @@ false
     }
 --- response_body
 false
+
+
+
+=== TEST 26: ~=: test ~= for the r_v is a number and equal with the tonumber(l_v), not hit
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"arg_age", "~=", 18}
+            })
+
+            ngx.say(ex:eval(ngx.var))
+        }
+    }
+--- request
+GET /t?age=18
+--- response_body
+false
+
+
+
+=== TEST 27: ~=: test ~= for the r_v is a number and not equal with the tonumber(l_v), hit
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"arg_age", "~=", 18}
+            })
+
+            ngx.say(ex:eval(ngx.var))
+        }
+    }
+--- request
+GET /t?age=16
+--- response_body
+true
+
+
+
+=== TEST 28: ~=: test ~= for the r_v is a number and the l_v is not , hit
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"arg_age", "~=", 18}
+            })
+
+            ngx.say(ex:eval(ngx.var))
+        }
+    }
+--- request
+GET /t?age=aa
+--- response_body
+true
+
+
+
+=== TEST 29: ~=: test ~= for the r_v is a string but the tonumber() is true, not hit
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"arg_age", "~=", "18"}
+            })
+
+            ngx.say(ex:eval(ngx.var))
+        }
+    }
+--- request
+GET /t?age=18
+--- response_body
+false
