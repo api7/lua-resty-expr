@@ -511,7 +511,7 @@ false
 
 
 
-=== TEST 26: ~=: test ~= for the r_v is a number and equal with the tonumber(l_v), not hit
+=== TEST 26: test ~= for the r_v is a number and equal with the tonumber(l_v), not hit
 --- config
     location /t {
         content_by_lua_block {
@@ -530,7 +530,7 @@ false
 
 
 
-=== TEST 27: ~=: test ~= for the r_v is a number and not equal with the tonumber(l_v), hit
+=== TEST 27: test ~= for the r_v is a number and not equal with the tonumber(l_v), hit
 --- config
     location /t {
         content_by_lua_block {
@@ -549,7 +549,7 @@ true
 
 
 
-=== TEST 28: ~=: test ~= for the r_v is a number and the l_v is not , hit
+=== TEST 28: test ~= for the r_v is a number and the l_v is not , hit
 --- config
     location /t {
         content_by_lua_block {
@@ -568,7 +568,7 @@ true
 
 
 
-=== TEST 29: ~=: test ~= for the r_v is a string but the tonumber() is true, not hit
+=== TEST 29: test ~= for the r_v is a string but the tonumber() is true, not hit
 --- config
     location /t {
         content_by_lua_block {
