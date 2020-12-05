@@ -584,3 +584,60 @@ true
 GET /t?age=18
 --- response_body
 false
+
+
+
+=== TEST 30: the request parameter `name` is missing and the operator is `~=`
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"arg_name", "~=", "jack"}
+            })
+
+            ngx.say(ex:eval(ngx.var))
+        }
+    }
+--- request
+GET /t
+--- response_body
+true
+
+
+
+=== TEST 31: the request parameter `name` is missing and the operator is `~~`
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"arg_name", "~~", "[a-z]{1,4}"}
+            })
+
+            ngx.say(ex:eval(ngx.var))
+        }
+    }
+--- request
+GET /t
+--- response_body
+false
+
+
+
+=== TEST 32: the request parameter `name` is missing and the operator is `~*`
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"arg_name", "~*", "[a-z]{1,4}"}
+            })
+
+            ngx.say(ex:eval(ngx.var))
+        }
+    }
+--- request
+GET /t
+--- response_body
+false
