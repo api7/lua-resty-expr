@@ -95,6 +95,10 @@ local compare_funcs = {
         return l_v < r_v
     end,
     ["~~"] = function (l_v, r_v)
+        if not l_v then
+            return false
+        end
+
         local from = re_find(l_v, r_v, "jo")
         if from then
             return true
@@ -102,6 +106,10 @@ local compare_funcs = {
         return false
     end,
     ["~*"] = function (l_v, r_v)
+        if not l_v then
+            return false
+        end
+
         local from = re_find(l_v, r_v, "joi")
         if from then
             return true
