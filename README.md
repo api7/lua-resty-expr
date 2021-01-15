@@ -34,11 +34,9 @@ Table of Contents
      content_by_lua_block {
         local expr = require("resty.expr.v1")
         local ex = expr.new({
-            {
-                {"arg_name", "==", "json"},
-                {"arg_weight", ">", 10},
-                {"arg_weight", "!", ">", 15},
-            }
+            {"arg_name", "==", "json"},
+            {"arg_weight", ">", 10},
+            {"arg_weight", "!", ">", 15},
         })
 
         -- equal to
