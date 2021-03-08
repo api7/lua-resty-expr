@@ -59,7 +59,7 @@ invalid operator '='
     }
 --- response_body
 invalid expression
-invalid expression
+rule too short
 
 
 
@@ -92,3 +92,44 @@ bad 'not' expression
     }
 --- response_body
 missing argument rule
+
+
+
+=== TEST 5: rule too short
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex, err = expr.new({
+                "OR",
+                {"arg_weight", ">", 10},
+            })
+            ngx.say(err)
+        }
+    }
+--- request
+GET /t?weight=12
+--- response_body
+rule too short
+
+
+
+=== TEST 6: rule too short, nested
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex, err = expr.new({
+                "OR",
+                {"arg_weight", ">", 10},
+                {
+                    "AND"
+                }
+            })
+            ngx.say(err)
+        }
+    }
+--- request
+GET /t?weight=12
+--- response_body
+rule too short

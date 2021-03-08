@@ -135,74 +135,184 @@ local function compare_val(l_v, op, r_v)
 end
 
 
+local function compile_expr(expr)
+    local l_v, op, r_v
+    local reverse = false
+
+    if #expr == 4 then
+        if expr[2] ~= not_op then
+            return nil, "bad 'not' expression"
+        end
+
+        reverse = true
+        l_v, op, r_v = expr[1], expr[3], expr[4]
+    else
+        l_v, op, r_v = expr[1], expr[2], expr[3]
+    end
+
+    if r_v == nil and not compare_funcs[op] then
+        -- for compatibility
+        r_v = op
+        op = "=="
+
+        if r_v == nil then
+            return nil, "invalid expression"
+        end
+    end
+
+    if l_v == nil or op == nil then
+        return nil, "invalid expression"
+    end
+
+    if compare_funcs[op] == nil then
+        return nil, "invalid operator '" .. op .. "'"
+    end
+
+    return {
+        l_v = l_v,
+        op = op,
+        r_v = r_v,
+        reverse = reverse,
+    }
+end
+
+
+local logic_ops = {
+    ["OR"] = true,
+    ["!OR"] = true,
+    ["AND"] = true,
+    ["!AND"] = true,
+}
+
+
+local function compile(rules)
+    local n_rule = #rules
+    if n_rule <= 0 then
+        return nil, "rule too short"
+    end
+
+    local compiled = {
+        logic_op = "AND",
+        exprs = new_tab(n_rule, 0),
+    }
+
+    if type(rules[1]) == "table" then
+        for i, expr in ipairs(rules) do
+            local res, err = compile(rules[i])
+            if not res then
+                return nil, err
+            end
+
+            compiled.exprs[i] = res
+        end
+        return compiled
+    end
+
+    if logic_ops[rules[1]] then
+        compiled.logic_op = rules[1]
+        if n_rule <= 2 then
+            return nil, "rule too short"
+        end
+
+        for i = 2, n_rule do
+            local res, err = compile(rules[i])
+            if not res then
+                return nil, err
+            end
+
+            compiled.exprs[i - 1] = res
+        end
+
+        return compiled
+    end
+
+    return compile_expr(rules)
+end
+
+
 function _M.new(rule)
     if not rule then
         return nil, "missing argument rule"
     end
 
-    local compiled = new_tab(#rule, 0)
-    for i, expr in ipairs(rule) do
-        local l_v, op, r_v
-        local reverse = false
-
-        if #expr == 4 then
-            if expr[2] ~= not_op then
-                return nil, "bad 'not' expression"
-            end
-
-            reverse = true
-            l_v, op, r_v = expr[1], expr[3], expr[4]
-        else
-            l_v, op, r_v = expr[1], expr[2], expr[3]
-        end
-
-        if r_v == nil and not compare_funcs[op] then
-            -- for compatibility
-            r_v = op
-            op = "=="
-
-            if r_v == nil then
-                return nil, "invalid expression"
-            end
-        end
-
-        if l_v == nil or op == nil then
-            return nil, "invalid expression"
-        end
-
-        if compare_funcs[op] == nil then
-            return nil, "invalid operator '" .. op .. "'"
-        end
-
-        compiled[i] = {
-            l_v = l_v,
-            op = op,
-            r_v = r_v,
-            reverse = reverse,
-        }
+    local compiled, err = compile(rule)
+    if not compiled then
+        return nil, err
     end
 
     return setmetatable({rule = compiled}, mt)
 end
 
 
+local eval
 -- '...' is chosen for backward compatibility, for instance, we need to pass
 -- `opts` argument in lua-resty-radixtree
+local function eval_and(ctx, exprs, ...)
+    for _, expr in ipairs(exprs) do
+        if expr.logic_op then
+            if not eval(ctx, expr, ...) then
+                return false
+            end
+        else
+            local l_v = ctx[expr.l_v]
+
+            if compare_val(l_v, expr.op, expr.r_v, ...) == expr.reverse then
+                return false
+            end
+        end
+    end
+
+    return true
+end
+
+
+local function eval_or(ctx, exprs, ...)
+    for _, expr in ipairs(exprs) do
+        if expr.logic_op then
+            if eval(ctx, expr, ...) then
+                return true
+            end
+        else
+            local l_v = ctx[expr.l_v]
+
+            if compare_val(l_v, expr.op, expr.r_v, ...) ~= expr.reverse then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
+
+eval = function(ctx, compiled, ...)
+    if compiled.logic_op == "AND" then
+        return eval_and(ctx, compiled.exprs, ...)
+    end
+
+    if compiled.logic_op == "OR" then
+        return eval_or(ctx, compiled.exprs, ...)
+    end
+
+    if compiled.logic_op == "!AND" then
+        return not eval_and(ctx, compiled.exprs, ...)
+    end
+
+    if compiled.logic_op == "!OR" then
+        return not eval_or(ctx, compiled.exprs, ...)
+    end
+
+    error("unknown logic operator: " .. (compiled.logic_op or "nil"))
+end
+
+
 function _M.eval(self, ctx, ...)
     local ctx = ctx or ngx_var
     if type(ctx) ~= "table" then
         return nil, "bad ctx type"
     end
 
-    for _, expr in ipairs(self.rule) do
-        local l_v = ctx[expr.l_v]
-
-        if compare_val(l_v, expr.op, expr.r_v, ...) == expr.reverse then
-            return false
-        end
-    end
-
-    return true
+    return eval(ctx, self.rule, ...)
 end
 
 
