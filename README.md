@@ -101,15 +101,15 @@ Logical operator can be one of
 Their combination can be like:
 
 ```json
-{
+[
     "AND",
-    {"arg_name", "==", "json"},
-    {
+    ["arg_name", "==", "json"],
+    [
         "!OR",
-        {"arg_weight", ">", 10},
-        {"arg_height", "!", ">", 15}
-    }
-})
+        ["arg_weight", ">", 10],
+        ["arg_height", "!", ">", 15]
+    ]
+]
 ```
 
 [Back to TOC](#table-of-contents)
