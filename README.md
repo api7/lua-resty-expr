@@ -46,6 +46,29 @@ Table of Contents
  }
 ```
 
+```lua
+ location / {
+     content_by_lua_block {
+        local expr = require("resty.expr.v1")
+        local ex = expr.new({
+            "!AND",
+            {"arg_name", "==", "json"},
+            {
+                "OR",
+                {"arg_weight", ">", 10},
+                {"arg_height", "!", ">", 15},
+            }
+        })
+
+        -- equal to
+        -- 'ngx.say(not (ngx.var.arg_name == "json" and
+        --               (ngx.var.arg_weight > 10 or
+        --                not ngx.var.arg_height > 15))'
+        ngx.say(ex:eval(ngx.var))
+     }
+ }
+```
+
 [Back to TOC](#table-of-contents)
 
 ## Methods
@@ -54,15 +77,39 @@ Table of Contents
 
 `syntax: ex, err = expr.new(rule)`
 
-Create a expression object which can be evaluated later.
+Create an expression object which can be evaluated later.
 
-The syntax of rule is an array table of expressions.
-Each expression is an array table which has three elements:
+The syntax of rule is an array table of nodes.
+
+The first node can be an expression or a logical operator.
+The remain nodes can be an expression or another array of nodes which contain its logical operator and expressions.
+
+Each expression is an array table which has three or four elements:
 ```lua
 {
     {"var name (aka. left value)", "optional '!' operator", "operator", "const value (aka. right value)"},
     ...
 }
+```
+
+Logical operator can be one of
+* OR
+* AND
+* !OR: not (expr1 or expr2 or ...)
+* !AND: not (expr1 and expr2 and ...)
+
+Their combination can be like:
+
+```json
+[
+    "AND",
+    ["arg_name", "==", "json"],
+    [
+        "!OR",
+        ["arg_weight", ">", 10],
+        ["arg_height", "!", ">", 15]
+    ]
+]
 ```
 
 [Back to TOC](#table-of-contents)
