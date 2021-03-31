@@ -21,6 +21,8 @@ local ipairs      = ipairs
 local setmetatable = setmetatable
 local tonumber    = tonumber
 local type = type
+local str_upper = string.upper
+local str_lower = string.lower
 local new_tab     = require("table.new")
 local re_find     = ngx.re.find
 local ngx_var     = ngx.var
@@ -116,7 +118,6 @@ local compare_funcs = {
         end
         return false
     end,
-    ["IN"] = in_array,
     ["in"] = in_array,
     ["has"] = has_element,
 }
@@ -148,6 +149,10 @@ local function compile_expr(expr)
         l_v, op, r_v = expr[1], expr[3], expr[4]
     else
         l_v, op, r_v = expr[1], expr[2], expr[3]
+    end
+
+    if op ~= nil then
+        op = str_lower(op)
     end
 
     if r_v == nil and not compare_funcs[op] then
@@ -208,8 +213,9 @@ local function compile(rules)
         return compiled
     end
 
-    if logic_ops[rules[1]] then
-        compiled.logic_op = rules[1]
+    local op = str_upper(rules[1])
+    if logic_ops[op] then
+        compiled.logic_op = op
         if n_rule <= 2 then
             return nil, "rule too short"
         end

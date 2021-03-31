@@ -641,3 +641,30 @@ false
 GET /t
 --- response_body
 false
+
+
+
+=== TEST 33: operator is case insensitive
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                "or",
+                {"x", "HAS", "a"},
+                {"x", "HAS", "c"}
+            })
+
+            ngx.say(ex:eval({x = {'a', 'b'}}))
+            ngx.say(ex:eval({x = {'a'}}))
+            ngx.say(ex:eval({x = {'b'}}))
+            ngx.say(ex:eval({x = {}}))
+            ngx.say(ex:eval({x = {'c'}}))
+        }
+    }
+--- response_body
+true
+true
+false
+false
+true
