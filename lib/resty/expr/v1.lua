@@ -88,6 +88,14 @@ local compare_funcs = {
         end
         return l_v > r_v
     end,
+    [">="] = function (l_v, r_v)
+        l_v = tonumber(l_v)
+        r_v = tonumber(r_v)
+        if not l_v or not r_v then
+            return false
+        end
+        return l_v >= r_v
+    end,
     ["<"] = function (l_v, r_v)
         l_v = tonumber(l_v)
         r_v = tonumber(r_v)
@@ -95,6 +103,14 @@ local compare_funcs = {
             return false
         end
         return l_v < r_v
+    end,
+    ["<="] = function (l_v, r_v)
+        l_v = tonumber(l_v)
+        r_v = tonumber(r_v)
+        if not l_v or not r_v then
+            return false
+        end
+        return l_v <= r_v
     end,
     ["~~"] = function (l_v, r_v)
         if not l_v then

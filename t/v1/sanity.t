@@ -668,3 +668,49 @@ true
 false
 false
 true
+
+
+
+=== TEST 34: >=
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"arg_k", ">=", "2"}
+            })
+            ngx.say(ex:eval(ngx.var))
+            local ex = expr.new({
+                {"arg_k", ">=", 3}
+            })
+            ngx.say(ex:eval(ngx.var))
+        }
+    }
+--- request
+GET /t?k=2
+--- response_body
+true
+false
+
+
+
+=== TEST 35: <=
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"arg_k", "<=", "2"}
+            })
+            ngx.say(ex:eval(ngx.var))
+            local ex = expr.new({
+                {"arg_k", "<=", 3}
+            })
+            ngx.say(ex:eval(ngx.var))
+        }
+    }
+--- request
+GET /t?k=3
+--- response_body
+false
+true
