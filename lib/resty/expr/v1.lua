@@ -257,6 +257,11 @@ function _M.new(rule)
         return nil, "missing argument rule"
     end
 
+    local n_rule = #rule
+    if n_rule == 0 then
+        return setmetatable({}, mt)
+    end
+
     local compiled, err = compile(rule)
     if not compiled then
         return nil, err
@@ -329,6 +334,10 @@ end
 
 
 function _M.eval(self, ctx, ...)
+    if not self.rule then
+        return true
+    end
+
     local ctx = ctx or ngx_var
     if type(ctx) ~= "table" then
         return nil, "bad ctx type"

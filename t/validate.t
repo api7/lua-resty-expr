@@ -133,3 +133,22 @@ rule too short
 GET /t?weight=12
 --- response_body
 rule too short
+
+
+
+=== TEST 7: empty rule
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex, err = expr.new({
+            })
+            ngx.say(err)
+            ngx.say(ex:eval(ngx.var))
+        }
+    }
+--- request
+GET /t?weight=12
+--- response_body
+nil
+true
