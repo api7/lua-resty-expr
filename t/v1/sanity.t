@@ -714,3 +714,19 @@ GET /t?k=3
 --- response_body
 false
 true
+
+
+
+=== TEST 36: http header doesn't exist
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex = expr.new({
+                {"http_test", "~=", nil}
+            })
+            ngx.say(ex:eval(ngx.var))
+        }
+    }
+--- response_body
+false
