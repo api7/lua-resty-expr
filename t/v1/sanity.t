@@ -717,7 +717,7 @@ true
 
 
 
-=== TEST 36: http header exist
+=== TEST 36: http header doesn't exist
 --- config
     location /t {
         content_by_lua_block {
