@@ -262,6 +262,13 @@ function _M.new(rule)
         return setmetatable({}, mt)
     end
 
+    if type(rule[1]) ~= "table" then
+        local op = str_upper(rule[1])
+        if not logic_ops[op] then
+            return nil, "rule should be wrapped inside brackets"
+        end
+    end
+
     local compiled, err = compile(rule)
     if not compiled then
         return nil, err

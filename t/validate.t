@@ -152,3 +152,23 @@ GET /t?weight=12
 --- response_body
 nil
 true
+
+
+
+=== TEST 8: rule without brackets
+--- config
+    location /t {
+        content_by_lua_block {
+            local expr = require("resty.expr.v1")
+            local ex, err = expr.new({"arg_k", "==", "v"})
+            if not err then
+                ngx.say(ex:eval(ngx.var))
+            else
+                ngx.say(err)
+            end
+        }
+    }
+--- request
+GET /t?k=12
+--- response_body
+rule should be wrapped inside brackets
