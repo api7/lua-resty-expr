@@ -32,14 +32,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install openresty
 
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-
       - name: Linux Dependency
         run: |
           curl https://raw.githubusercontent.com/apache/apisix/master/utils/linux-install-luarocks.sh -sL | sh -
-          make deps
+          sudo make deps
 
       - name: Linux Script
         run: |
