@@ -2,7 +2,7 @@ name: CI Linux
 
 on:
   push:
-    branches: [ main, ipmatch ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
