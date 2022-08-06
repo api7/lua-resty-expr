@@ -2,7 +2,7 @@ name: CI Linux
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, ipmatch ]
   pull_request:
     branches: [ main ]
 
@@ -29,6 +29,9 @@ jobs:
         run: |
           sudo cpanm --notest Test::Nginx > build.log 2>&1 || (cat build.log && exit 1)
           sudo luarocks install luacheck
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
 
       - name: Linux Install
         run: |
