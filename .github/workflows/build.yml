@@ -32,7 +32,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install openresty
 
-      - name: Linux Dependency
+      - name: Install Dependency
         run: |
           curl https://raw.githubusercontent.com/apache/apisix/master/utils/linux-install-luarocks.sh -sL | sh -
           sudo make deps
