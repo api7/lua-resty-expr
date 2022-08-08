@@ -27,6 +27,7 @@ local new_tab     = require("table.new")
 local re_find     = ngx.re.find
 local ngx_var     = ngx.var
 local ngx_null    = ngx.null
+local ipmatcher   = require("resty.ipmatcher")
 
 
 local _M = {}
@@ -58,6 +59,12 @@ local function has_element(l_v, r_v)
     end
 
     return false
+end
+
+
+
+local function ip_match(l_v, r_v)
+    return r_v:match(l_v)
 end
 
 
@@ -136,6 +143,7 @@ local compare_funcs = {
     end,
     ["in"] = in_array,
     ["has"] = has_element,
+    ["ipmatch"] = ip_match,
 }
 
 
@@ -187,6 +195,26 @@ local function compile_expr(expr)
 
     if compare_funcs[op] == nil then
         return nil, "invalid operator '" .. op .. "'"
+    end
+
+    if op == "ipmatch" then
+        if not r_v or r_v == "" then
+            return nil, "invalid ip address"
+        end
+        if type(r_v) ~= "table" then
+            r_v = { r_v }
+        end
+
+        if #r_v == 0 then
+            return nil, "invalid ip address"
+        end
+
+        local ip, err = ipmatcher.new(r_v)
+        if not ip then
+            return false, err
+        end
+
+        r_v = ip
     end
 
     return {

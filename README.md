@@ -127,6 +127,7 @@ Their combination can be like:
 |in      |find in array|{"arg_name", "in", {"1","2"}}|
 |has     |left value array has value in the right |{"graphql_root_fields", "has", "repo"}|
 |!       |reverse the result|{"arg_name", "!", "~~", "[a-z]+"}|
+|ipmatch |ip address match|{"remote_addr", "ipmatch", {"127.0.0.1", "192.168.0.0/16"}}|
 
 [Back to TOC](#table-of-contents)
 
