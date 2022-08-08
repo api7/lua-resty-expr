@@ -63,7 +63,7 @@ end
 
 
 
-local function ip_matcher(l_v, r_v)
+local function ip_match(l_v, r_v)
     return r_v:match(l_v)
 end
 
@@ -143,7 +143,7 @@ local compare_funcs = {
     end,
     ["in"] = in_array,
     ["has"] = has_element,
-    ["ipmatcher"] = ip_matcher,
+    ["ipmatch"] = ip_match,
 }
 
 
@@ -197,16 +197,16 @@ local function compile_expr(expr)
         return nil, "invalid operator '" .. op .. "'"
     end
 
-    if op == "ipmatcher" then
+    if op == "ipmatch" then
         if not r_v or r_v == "" then
-            return nil, "invalid ipmatcher address"
+            return nil, "invalid ip address"
         end
         if type(r_v) ~= "table" then
             r_v = { r_v }
         end
 
         if #r_v == 0 then
-            return nil, "invalid ipmatcher address"
+            return nil, "invalid ip address"
         end
 
         local ip, err = ipmatcher.new(r_v)

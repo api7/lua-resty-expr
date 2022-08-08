@@ -25,7 +25,7 @@ __DATA__
         content_by_lua_block {
             local expr = require("resty.expr.v1")
             local ex = expr.new({
-                {"remote_addr", "ipmatcher", "127.0.0.1"},
+                {"remote_addr", "ipmatch", "127.0.0.1"},
             })
             ngx.say(ex:eval(ngx.var))
         }
@@ -35,7 +35,7 @@ true
 
 
 
-=== TEST 2: invalid ipmatcher address
+=== TEST 2: invalid ipmatch address
 --- config
     location /t {
         content_by_lua_block {
@@ -43,26 +43,26 @@ true
 
             -- validate by expr
             local ex, err = expr.new({
-                {"remote_addr", "ipmatcher", nil}
+                {"remote_addr", "ipmatch", nil}
 
             })
             ngx.say(err)
 
             local ex, err = expr.new({
-                {"remote_addr", "ipmatcher", ""}
+                {"remote_addr", "ipmatch", ""}
 
             })
             ngx.say(err)
 
             local ex, err = expr.new({
-                {"remote_addr", "ipmatcher", {}}
+                {"remote_addr", "ipmatch", {}}
 
             })
             ngx.say(err)
 
-            -- validate by ipmatcher
+            -- validate by ipmatch
             local ex, err = expr.new({
-                {"remote_addr", "ipmatcher", {""}}
+                {"remote_addr", "ipmatch", {""}}
 
             })
 
@@ -70,9 +70,9 @@ true
         }
     }
 --- response_body
-invalid ipmatcher address
-invalid ipmatcher address
-invalid ipmatcher address
+invalid ip address
+invalid ip address
+invalid ip address
 
 
 
@@ -82,7 +82,7 @@ invalid ipmatcher address
         content_by_lua_block {
             local expr = require("resty.expr.v1")
             local ex = expr.new({
-                {"remote_addr", "ipmatcher", {"127.0.0.1"}},
+                {"remote_addr", "ipmatch", {"127.0.0.1"}},
             })
             ngx.say(ex:eval(ngx.var))
         }
@@ -98,12 +98,12 @@ true
         content_by_lua_block {
             local expr = require("resty.expr.v1")
             local ex = expr.new({
-                {"remote_addr", "ipmatcher", "127.0.0.0/16"},
+                {"remote_addr", "ipmatch", "127.0.0.0/16"},
             })
             ngx.say(ex:eval(ngx.var))
 
             local ex = expr.new({
-                {"remote_addr", "ipmatcher", {"127.0.0.0/16"}},
+                {"remote_addr", "ipmatch", {"127.0.0.0/16"}},
             })
             ngx.say(ex:eval(ngx.var))
         }
@@ -120,12 +120,12 @@ true
         content_by_lua_block {
             local expr = require("resty.expr.v1")
             local ex = expr.new({
-                {"remote_addr", "ipmatcher", {"127.0.0.1", "127.0.0.2"}},
+                {"remote_addr", "ipmatch", {"127.0.0.1", "127.0.0.2"}},
             })
             ngx.say(ex:eval(ngx.var))
 
             local ex = expr.new({
-                {"remote_addr", "ipmatcher", {"127.0.0.2", "127.0.0.3"}},
+                {"remote_addr", "ipmatch", {"127.0.0.2", "127.0.0.3"}},
             })
             ngx.say(ex:eval(ngx.var))
         }
@@ -142,12 +142,12 @@ false
         content_by_lua_block {
             local expr = require("resty.expr.v1")
             local ex = expr.new({
-                {"arg_real_ip", "ipmatcher", {"127.0.0.1"}},
+                {"arg_real_ip", "ipmatch", {"127.0.0.1"}},
             })
             ngx.say(ex:eval(ngx.var))
 
             local ex = expr.new({
-                {"arg_real_ip", "ipmatcher", {"127.0.0.2"}},
+                {"arg_real_ip", "ipmatch", {"127.0.0.2"}},
             })
             ngx.say(ex:eval(ngx.var))
         }
@@ -166,12 +166,12 @@ false
         content_by_lua_block {
             local expr = require("resty.expr.v1")
             local ex = expr.new({
-                {"http_real_ip", "ipmatcher", {"127.0.0.1"}},
+                {"http_real_ip", "ipmatch", {"127.0.0.1"}},
             })
             ngx.say(ex:eval(ngx.var))
 
             local ex = expr.new({
-                {"http_real_ip", "ipmatcher", {"127.0.0.2"}},
+                {"http_real_ip", "ipmatch", {"127.0.0.2"}},
             })
             ngx.say(ex:eval(ngx.var))
         }
@@ -190,14 +190,14 @@ false
         content_by_lua_block {
             local expr = require("resty.expr.v1")
             local ex = expr.new({
-                {"remote_addr", "ipmatcher", {"127.0.0.1"}},
+                {"remote_addr", "ipmatch", {"127.0.0.1"}},
                 {"arg_k", "==", "v"}
 
             })
             ngx.say(ex:eval(ngx.var))
 
             local ex = expr.new({
-                {"remote_addr", "ipmatcher", {"127.0.0.2"}},
+                {"remote_addr", "ipmatch", {"127.0.0.2"}},
                 {"arg_k", "==", "v"}
             })
             ngx.say(ex:eval(ngx.var))
