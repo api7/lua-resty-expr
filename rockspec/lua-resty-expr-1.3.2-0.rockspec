@@ -16,7 +16,6 @@ dependencies = {
     "lua-resty-ipmatcher = 0.6.1"
 }
 
-
 build = {
    type = "builtin",
    modules = {
