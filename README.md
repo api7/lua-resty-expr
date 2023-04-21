@@ -92,13 +92,16 @@ Each expression is an array table which has three or four elements:
 }
 ```
 
-Logical operator can be one of
+### Logical Operators
+
+Logical operator can be one of the following:
+
 * OR
 * AND
 * !OR: not (expr1 or expr2 or ...)
 * !AND: not (expr1 and expr2 and ...)
 
-Their combination can be like:
+Example ussage with comparison operators:
 
 ```json
 [
@@ -114,7 +117,7 @@ Their combination can be like:
 
 [Back to TOC](#table-of-contents)
 
-#### Operator List
+### Comparison Operators
 
 |operator|description|example|
 |--------|-----------|-------|
