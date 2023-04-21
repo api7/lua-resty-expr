@@ -100,7 +100,9 @@ Each expression is an array table which has three or four elements:
 |==      |equal      |{"arg_name", "==", "json"}|
 |~=      |not equal  |{"arg_name", "~=", "json"}|
 |>       |greater than|{"arg_age", ">", 24}|
+|>=      |greater than or equal to|{"arg_age", ">=", 24}|
 |<       |less than  |{"arg_age", "<", 24}|
+|<=      |less than or equal to|{"arg_age", "<=", 24}|
 |~~      |Regular match|{"arg_name", "~~", "[a-z]+"}|
 |~*      |Case insensitive regular match|{"arg_name", "~*", "[a-z]+"}|
 |in      |find in array|{"arg_name", "in", {"1","2"}}|
@@ -112,14 +114,12 @@ Each expression is an array table which has three or four elements:
 
 #### Logical Operators
 
-Logical operator can be one of the following:
-
 * OR
 * AND
 * !OR: not (expr1 or expr2 or ...)
 * !AND: not (expr1 and expr2 and ...)
 
-Example ussage with comparison operators:
+Example usage with comparison operators:
 
 ```json
 [
