@@ -20,7 +20,7 @@ Table of Contents
     * [Synopsis](#synopsis)
     * [Methods](#methods)
         * [new](#new)
-            * [Operator List](#operator-list)
+            * [Operator List](#operator-list)  NEED UPDATE
         * [eval](#eval)
     * [Install](#install)
         * [Compile and install](#compile-and-install)
@@ -92,7 +92,7 @@ Each expression is an array table which has three or four elements:
 }
 ```
 
-### Logical Operators
+#### Logical Operators
 
 Logical operator can be one of the following:
 
@@ -117,7 +117,7 @@ Example ussage with comparison operators:
 
 [Back to TOC](#table-of-contents)
 
-### Comparison Operators
+#### Comparison Operators
 
 |operator|description|example|
 |--------|-----------|-------|
