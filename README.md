@@ -103,11 +103,11 @@ Each expression is an array table which has three or four elements:
 |>=      |greater than or equal to|{"arg_age", ">=", 24}|
 |<       |less than  |{"arg_age", "<", 24}|
 |<=      |less than or equal to|{"arg_age", "<=", 24}|
-|~~      |match RegEx|{"arg_name", "~~", "[a-z]+"}|
-|~*      |match RegEx (case-insensitive)|{"arg_name", "~*", "[a-z]+"}|
-|in      |find in array|{"arg_name", "in", {"1","2"}}|
-|has     |left value array has value in the right |{"graphql_root_fields", "has", "repo"}|
-|!       |reverse the result|{"arg_name", "!", "~~", "[a-z]+"}|
+|~~      |match RegEx, case-sensitive|{"arg_name", "~~", "[a-z]+"}|
+|~*      |match RegEx, case-insensitive|{"arg_name", "~*", "[a-z]+"}|
+|in      |LFS in RHS|{"arg_name", "in", {"1","2"}
+|has     |RHS in LHS|{"graphql_root_fields", "has", "repo"}|
+|!       |reverse the RHS|{"arg_name", "!", "~~", "[a-z]+"}|
 |ipmatch |ip address match|{"remote_addr", "ipmatch", {"127.0.0.1", "192.168.0.0/16"}}|
 
 [Back to TOC](#table-of-contents)
