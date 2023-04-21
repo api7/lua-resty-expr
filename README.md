@@ -20,7 +20,8 @@ Table of Contents
     * [Synopsis](#synopsis)
     * [Methods](#methods)
         * [new](#new)
-            * [Operator List](#operator-list)  NEED UPDATE
+            * [Comparison Operators](#comparison-operators)
+            * [Logical Operators](#logical-operators)
         * [eval](#eval)
     * [Install](#install)
         * [Compile and install](#compile-and-install)
@@ -92,6 +93,23 @@ Each expression is an array table which has three or four elements:
 }
 ```
 
+#### Comparison Operators
+
+|operator|description|example|
+|--------|-----------|-------|
+|==      |equal      |{"arg_name", "==", "json"}|
+|~=      |not equal  |{"arg_name", "~=", "json"}|
+|>       |greater than|{"arg_age", ">", 24}|
+|<       |less than  |{"arg_age", "<", 24}|
+|~~      |Regular match|{"arg_name", "~~", "[a-z]+"}|
+|~*      |Case insensitive regular match|{"arg_name", "~*", "[a-z]+"}|
+|in      |find in array|{"arg_name", "in", {"1","2"}}|
+|has     |left value array has value in the right |{"graphql_root_fields", "has", "repo"}|
+|!       |reverse the result|{"arg_name", "!", "~~", "[a-z]+"}|
+|ipmatch |ip address match|{"remote_addr", "ipmatch", {"127.0.0.1", "192.168.0.0/16"}}|
+
+[Back to TOC](#table-of-contents)
+
 #### Logical Operators
 
 Logical operator can be one of the following:
@@ -114,23 +132,6 @@ Example ussage with comparison operators:
     ]
 ]
 ```
-
-[Back to TOC](#table-of-contents)
-
-#### Comparison Operators
-
-|operator|description|example|
-|--------|-----------|-------|
-|==      |equal      |{"arg_name", "==", "json"}|
-|~=      |not equal  |{"arg_name", "~=", "json"}|
-|>       |greater than|{"arg_age", ">", 24}|
-|<       |less than  |{"arg_age", "<", 24}|
-|~~      |Regular match|{"arg_name", "~~", "[a-z]+"}|
-|~*      |Case insensitive regular match|{"arg_name", "~*", "[a-z]+"}|
-|in      |find in array|{"arg_name", "in", {"1","2"}}|
-|has     |left value array has value in the right |{"graphql_root_fields", "has", "repo"}|
-|!       |reverse the result|{"arg_name", "!", "~~", "[a-z]+"}|
-|ipmatch |ip address match|{"remote_addr", "ipmatch", {"127.0.0.1", "192.168.0.0/16"}}|
 
 [Back to TOC](#table-of-contents)
 
