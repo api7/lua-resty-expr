@@ -95,40 +95,43 @@ Each expression is an array table which has three or four elements:
 
 #### Comparison Operators
 
-|operator|description|example|
+|**Operator**|**Description**|**Example**|
 |--------|-----------|-------|
-|==      |equal      |{"arg_name", "==", "json"}|
-|~=      |not equal  |{"arg_name", "~=", "json"}|
-|>       |greater than|{"arg_age", ">", 24}|
-|>=      |greater than or equal to|{"arg_age", ">=", 24}|
-|<       |less than  |{"arg_age", "<", 24}|
-|<=      |less than or equal to|{"arg_age", "<=", 24}|
-|~~      |match RegEx, case-sensitive|{"arg_name", "~~", "[a-z]+"}|
-|~*      |match RegEx, case-insensitive|{"arg_name", "~*", "[a-z]+"}|
-|in      |LFS in RHS|{"arg_name", "in", {"1","2"}
-|has     |RHS in LHS|{"graphql_root_fields", "has", "repo"}|
-|!       |reverse the RHS|{"arg_name", "!", "~~", "[a-z]+"}|
-|ipmatch |ip address match|{"remote_addr", "ipmatch", {"127.0.0.1", "192.168.0.0/16"}}|
+|`==`      |equal      |`["arg_version", "==", "v2"]`|
+|`~=`      |not equal  |`["arg_version", "~=", "v2"]`|
+|`>`       |greater than|`["arg_ttl", ">", 3600]`|
+|`>=`      |greater than or equal to|`["arg_ttl", ">=", 3600]`|
+|`<`       |less than  |`["arg_ttl", "<", 3600]`|
+|`<=`      |less than or equal to|`["arg_ttl", "<=", 3600]`|
+|`~~`      |match [RegEx](https://www.pcre.org)|`["arg_env", "~~", "[Dd]ev"]`|
+|`~*`      |match [RegEx](https://www.pcre.org) (case-insensitive) |`["arg_env", "~~", "dev"]`|
+|`in`      |exist in the right-hand side|`["arg_version", "in", ["v1","v2"]]`|
+|`has`     |contain item in the right-hand side|`["graphql_root_fields", "has", "owner"]`|
+|`!`       |reverse the adjacent operator|`["arg_env", "!", "~~", "[Dd]ev"]`|
+|`ipmatch` |match IP address|`["remote_addr", "ipmatch", ["192.168.102.40", "192.168.3.0/24"]]`|
+
 
 [Back to TOC](#table-of-contents)
 
 #### Logical Operators
 
-* OR
-* AND
-* !OR: not (expr1 or expr2 or ...)
-* !AND: not (expr1 and expr2 and ...)
+| **Operator** | **Explanation** |
+|---|---|
+| `AND` | `AND(A,B)` is true if both A and B are true. |
+| `OR` | `OR(A,B)` is true if either A or B is true. |
+| `!AND` | `!AND(A,B)` is true if either A or B is false. |
+| `!OR` | `!OR(A,B)` is true only if both A and B are false. |
 
 Example usage with comparison operators:
 
 ```json
 [
     "AND",
-    ["arg_name", "==", "json"],
+    ["arg_version", "==", "v2"],
     [
-        "!OR",
-        ["arg_weight", ">", 10],
-        ["arg_height", "!", ">", 15]
+        "OR",
+        ["arg_action", "==", "signup"],
+        ["arg_action", "==", "subscribe"]
     ]
 ]
 ```
