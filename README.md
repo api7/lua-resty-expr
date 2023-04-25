@@ -20,7 +20,8 @@ Table of Contents
     * [Synopsis](#synopsis)
     * [Methods](#methods)
         * [new](#new)
-            * [Operator List](#operator-list)
+            * [Comparison Operators](#comparison-operators)
+            * [Logical Operators](#logical-operators)
         * [eval](#eval)
     * [Install](#install)
         * [Compile and install](#compile-and-install)
@@ -92,42 +93,48 @@ Each expression is an array table which has three or four elements:
 }
 ```
 
-Logical operator can be one of
-* OR
-* AND
-* !OR: not (expr1 or expr2 or ...)
-* !AND: not (expr1 and expr2 and ...)
+#### Comparison Operators
 
-Their combination can be like:
+|**Operator**|**Description**|**Example**|
+|--------|-----------|-------|
+|`==`      |equal      |`["arg_version", "==", "v2"]`|
+|`~=`      |not equal  |`["arg_version", "~=", "v2"]`|
+|`>`       |greater than|`["arg_ttl", ">", 3600]`|
+|`>=`      |greater than or equal to|`["arg_ttl", ">=", 3600]`|
+|`<`       |less than  |`["arg_ttl", "<", 3600]`|
+|`<=`      |less than or equal to|`["arg_ttl", "<=", 3600]`|
+|`~~`      |match [RegEx](https://www.pcre.org)|`["arg_env", "~~", "[Dd]ev"]`|
+|`~*`      |match [RegEx](https://www.pcre.org) (case-insensitive) |`["arg_env", "~~", "dev"]`|
+|`in`      |exist in the right-hand side|`["arg_version", "in", ["v1","v2"]]`|
+|`has`     |contain item in the right-hand side|`["graphql_root_fields", "has", "owner"]`|
+|`!`       |reverse the adjacent operator|`["arg_env", "!", "~~", "[Dd]ev"]`|
+|`ipmatch` |match IP address|`["remote_addr", "ipmatch", ["192.168.102.40", "192.168.3.0/24"]]`|
+
+
+[Back to TOC](#table-of-contents)
+
+#### Logical Operators
+
+| **Operator** | **Explanation** |
+|---|---|
+| `AND` | `AND(A,B)` is true if both A and B are true. |
+| `OR` | `OR(A,B)` is true if either A or B is true. |
+| `!AND` | `!AND(A,B)` is true if either A or B is false. |
+| `!OR` | `!OR(A,B)` is true only if both A and B are false. |
+
+Example usage with comparison operators:
 
 ```json
 [
     "AND",
-    ["arg_name", "==", "json"],
+    ["arg_version", "==", "v2"],
     [
-        "!OR",
-        ["arg_weight", ">", 10],
-        ["arg_height", "!", ">", 15]
+        "OR",
+        ["arg_action", "==", "signup"],
+        ["arg_action", "==", "subscribe"]
     ]
 ]
 ```
-
-[Back to TOC](#table-of-contents)
-
-#### Operator List
-
-|operator|description|example|
-|--------|-----------|-------|
-|==      |equal      |{"arg_name", "==", "json"}|
-|~=      |not equal  |{"arg_name", "~=", "json"}|
-|>       |greater than|{"arg_age", ">", 24}|
-|<       |less than  |{"arg_age", "<", 24}|
-|~~      |Regular match|{"arg_name", "~~", "[a-z]+"}|
-|~*      |Case insensitive regular match|{"arg_name", "~*", "[a-z]+"}|
-|in      |find in array|{"arg_name", "in", {"1","2"}}|
-|has     |left value array has value in the right |{"graphql_root_fields", "has", "repo"}|
-|!       |reverse the result|{"arg_name", "!", "~~", "[a-z]+"}|
-|ipmatch |ip address match|{"remote_addr", "ipmatch", {"127.0.0.1", "192.168.0.0/16"}}|
 
 [Back to TOC](#table-of-contents)
 
