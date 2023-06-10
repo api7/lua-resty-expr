@@ -1,37 +1,48 @@
-# lua-resty-expr
+# Name
 
-## Name
+A tiny DSL to evaluate expressions inside [Apache APISIX](https://github.com/apache/apisix).
 
-A tiny DSL to evaluate expressions which is used inside of APISIX.
+# Status
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/api7/lua-resty-expr/blob/main/LICENSE)
 
-This project has been working in microservices API gateway [Apache APISIX](https://github.com/apache/incubator-apisix).
+Used by:
 
-The project is open sourced by [Shenzhen ZhiLiu](https://www.apiseven.com/) Technology Co., Ltd.
+- [Apache APISIX](https://github.com/apache/apisix): A high-performance cloud native API gateway.
 
-In addition to this open source version, our company also provides a more powerful and performing commercial version, and provides technical support. If you are interested in our commercial version, please [contact us](https://www.apiseven.com/).
+Developed by [API7.ai](https://api7.ai/).
 
-Table of Contents
-=================
+> **Note**
+>
+> API7.ai provides technical support for the software it maintains like this library and [Apache APISIX](https://github.com/apache/apisix). Please [contact us](https://api7.ai/contact) to learn more.
 
-* [lua-resty-expr](#lua-resty-expr)
-    * [Name](#name)
-    * [Synopsis](#synopsis)
-    * [Methods](#methods)
-        * [new](#new)
-            * [Comparison Operators](#comparison-operators)
-            * [Logical Operators](#logical-operators)
-        * [eval](#eval)
-    * [Install](#install)
-        * [Compile and install](#compile-and-install)
-    * [DEV ENV](#dev-env)
-        * [Install Dependencies](#install-dependencies)
+# Table of Contents
 
-## Synopsis
+- [Name](#name)
+- [Status](#status)
+- [Table of Contents](#table-of-contents)
+- [Synopsis](#synopsis)
+- [Methods](#methods)
+  - [new](#new)
+    - [Usage](#usage)
+  - [eval](#eval)
+    - [Usage](#usage-1)
+    - [Example](#example)
+- [Operators](#operators)
+  - [Comparison Operators](#comparison-operators)
+  - [Logical Operators](#logical-operators)
+  - [Example](#example-1)
+- [Installation](#installation)
+  - [From LuaRocks](#from-luarocks)
+  - [From Source](#from-source)
+- [Development](#development)
+
+# Synopsis
 
 ```lua
  location / {
+     set $arg_name 'json';
+     set $arg_weight 12;
      content_by_lua_block {
         local expr = require("resty.expr.v1")
         local ex = expr.new({
@@ -40,7 +51,7 @@ Table of Contents
             {"arg_weight", "!", ">", 15},
         })
 
-        -- equal to
+        -- evaluates to
         -- 'ngx.say(ngx.var.arg_name == "json" and ngx.var.arg_weight > 10 and not ngx.var.arg_weight > 15)'
         ngx.say(ex:eval(ngx.var))
      }
@@ -49,105 +60,74 @@ Table of Contents
 
 ```lua
  location / {
-     content_by_lua_block {
-        local expr = require("resty.expr.v1")
-        local ex = expr.new({
-            "!AND",
-            {"arg_name", "==", "json"},
-            {
-                "OR",
-                {"arg_weight", ">", 10},
-                {"arg_height", "!", ">", 15},
-            }
-        })
+    set $arg_name 'json';
+    set $arg_weight 12;
+    content_by_lua_block {
+      local expr = require("resty.expr.v1")
+      local ex = expr.new({
+          "!AND",
+          {"arg_name", "==", "json"},
+          {
+              "OR",
+              {"arg_weight", ">", 10},
+              {"arg_height", "!", ">", 15},
+          }
+      })
 
-        -- equal to
-        -- 'ngx.say(not (ngx.var.arg_name == "json" and
-        --               (ngx.var.arg_weight > 10 or
-        --                not ngx.var.arg_height > 15))'
-        ngx.say(ex:eval(ngx.var))
+      -- evaluates to
+      -- 'ngx.say(not (ngx.var.arg_name == "json" and
+      --              (ngx.var.arg_weight > 10 or
+      --              not ngx.var.arg_height > 15))'
+      ngx.say(ex:eval(ngx.var))
      }
  }
 ```
 
 [Back to TOC](#table-of-contents)
 
-## Methods
+# Methods
 
-### new
+## new
 
-`syntax: ex, err = expr.new(rule)`
+Creates a new expression object.
 
-Create an expression object which can be evaluated later.
+### Usage
 
-The syntax of rule is an array table of nodes.
+`rule` is an array of nodes. The first node can be an expression or a logical operator. The remaining nodes can be an expression or another array of nodes with logical operators and expressions.
 
-The first node can be an expression or a logical operator.
-The remain nodes can be an expression or another array of nodes which contain its logical operator and expressions.
+```lua
+ex, err = expr.new(rule)
+```
 
-Each expression is an array table which has three or four elements:
+Each expression is an array which can three or four elements:
+
 ```lua
 {
-    {"var name (aka. left value)", "optional '!' operator", "operator", "const value (aka. right value)"},
+    {"variable", "optional '!' operator", "operator", "constant"},
     ...
 }
 ```
 
-#### Comparison Operators
-
-|**Operator**|**Description**|**Example**|
-|--------|-----------|-------|
-|`==`      |equal      |`["arg_version", "==", "v2"]`|
-|`~=`      |not equal  |`["arg_version", "~=", "v2"]`|
-|`>`       |greater than|`["arg_ttl", ">", 3600]`|
-|`>=`      |greater than or equal to|`["arg_ttl", ">=", 3600]`|
-|`<`       |less than  |`["arg_ttl", "<", 3600]`|
-|`<=`      |less than or equal to|`["arg_ttl", "<=", 3600]`|
-|`~~`      |match [RegEx](https://www.pcre.org)|`["arg_env", "~~", "[Dd]ev"]`|
-|`~*`      |match [RegEx](https://www.pcre.org) (case-insensitive) |`["arg_env", "~~", "dev"]`|
-|`in`      |exist in the right-hand side|`["arg_version", "in", ["v1","v2"]]`|
-|`has`     |contain item in the right-hand side|`["graphql_root_fields", "has", "owner"]`|
-|`!`       |reverse the adjacent operator|`["arg_env", "!", "~~", "[Dd]ev"]`|
-|`ipmatch` |match IP address|`["remote_addr", "ipmatch", ["192.168.102.40", "192.168.3.0/24"]]`|
-
-
 [Back to TOC](#table-of-contents)
 
-#### Logical Operators
+## eval
 
-| **Operator** | **Explanation** |
-|---|---|
-| `AND` | `AND(A,B)` is true if both A and B are true. |
-| `OR` | `OR(A,B)` is true if either A or B is true. |
-| `!AND` | `!AND(A,B)` is true if either A or B is false. |
-| `!OR` | `!OR(A,B)` is true only if both A and B are false. |
+Evaluates an expression.
 
-Example usage with comparison operators:
+### Usage
 
-```json
-[
-    "AND",
-    ["arg_version", "==", "v2"],
-    [
-        "OR",
-        ["arg_action", "==", "signup"],
-        ["arg_action", "==", "subscribe"]
-    ]
-]
+The expression is evaluated according to the `ctx`. If `ctx` is missing, `ngx.var` is used.
+
+```lua
+ok, err = ex:eval(ctx)
 ```
 
-[Back to TOC](#table-of-contents)
-
-### eval
-
-`syntax: ok, err = ex:eval(ctx)`
-
-Evaluate the expression according to the `ctx`. If `ctx` is missing, `ngx.var` is used by default.
+### Example
 
 ```lua
 local ok = rx:eval()
 if ok == nil then
-    log_err("failed to eval expression: ", err)
+    log_err("failed to evaluate expression: ", err)
     return false
 end
 
@@ -156,9 +136,59 @@ return ok
 
 [Back to TOC](#table-of-contents)
 
-## Install
+# Operators
 
-### Compile and install
+## Comparison Operators
+
+| Operator  | Description                                            | Example                                                            |
+|-----------|--------------------------------------------------------|--------------------------------------------------------------------|
+| `==`      | Equal to                                               | `["arg_version", "==", "v2"]`                                      |
+| `~=`      | Not equal to                                           | `["arg_version", "~=", "v2"]`                                      |
+| `>`       | Greater than                                           | `["arg_ttl", ">", 3600]`                                           |
+| `>=`      | Greater than or equal to                               | `["arg_ttl", ">=", 3600]`                                          |
+| `<`       | Less than                                              | `["arg_ttl", "<", 3600]`                                           |
+| `<=`      | Less than or equal to                                  | `["arg_ttl", "<=", 3600]`                                          |
+| `~~`      | Match [RegEx](https://www.pcre.org)                    | `["arg_env", "~~", "[Dd]ev"]`                                      |
+| `~*`      | Match [RegEx](https://www.pcre.org) (case-insensitive) | `["arg_env", "~~", "dev"]`                                         |
+| `in`      | Exists in the right-hand side of the operator          | `["arg_version", "in", ["v1","v2"]]`                               |
+| `has`     | Contains item in the right-hand side of the operator   | `["graphql_root_fields", "has", "owner"]`                          |
+| `!`       | Inverts the adjacent operator                          | `["arg_env", "!", "~~", "[Dd]ev"]`                                 |
+| `ipmatch` | Match IP address                                       | `["remote_addr", "ipmatch", ["192.168.102.40", "192.168.3.0/24"]]` |
+
+[Back to TOC](#table-of-contents)
+
+## Logical Operators
+
+| Operator | Description                                        |
+|----------|----------------------------------------------------|
+| `AND`    | `AND(A,B)` is true if both A and B are true.       |
+| `OR`     | `OR(A,B)` is true if either A or B is true.        |
+| `!AND`   | `!AND(A,B)` is true if either A or B is false.     |
+| `!OR`    | `!OR(A,B)` is true only if both A and B are false. |
+
+[Back to TOC](#table-of-contents)
+
+## Example
+
+```json
+[
+  "AND",
+  ["arg_version", "==", "v2"],
+  ["OR", ["arg_action", "==", "signup"], ["arg_action", "==", "subscribe"]]
+]
+```
+
+[Back to TOC](#table-of-contents)
+
+# Installation
+
+## From LuaRocks
+
+```shell
+luarocks install lua-resty-expr
+```
+
+## From Source
 
 ```shell
 make install
@@ -166,12 +196,12 @@ make install
 
 [Back to TOC](#table-of-contents)
 
-## DEV ENV
+# Development
 
-### Install Dependencies
+To install dependencies, run:
 
 ```shell
 make deps
 ```
-[Back to TOC](#table-of-contents)
 
+[Back to TOC](#table-of-contents)
